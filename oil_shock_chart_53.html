@@ -4473,33 +4473,13 @@ const YF_SYMBOLS = {
   gold: 'GC%3DF',
 };
 
-// プロキシ経由フェッチ（複数プロキシを順番に試す）
+// プロキシ経由フェッチ（Cloudflare Worker）
 async function fetchViaProxy(targetUrl, timeout = 10000) {
-  const enc = encodeURIComponent(targetUrl);
-  // query1/query2 両方 × 複数プロキシ
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${enc}`,
-    `https://corsproxy.io/?${enc}`,
-    `https://api.codetabs.com/v1/proxy?quest=${enc}`,
-    `https://thingproxy.freeboard.io/fetch/${targetUrl}`,
-  ];
-  // ランダムに並び替えてレート制限を分散
-  proxies.sort(() => Math.random() - 0.5);
-
-  let lastErr;
-  for (const proxyUrl of proxies) {
-    try {
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(timeout), referrerPolicy: 'no-referrer' });
-      if (res.ok) {
-        const text = await res.text();
-        // エラーレスポンスでないか確認
-        if (text.includes('"chart"') || text.includes('"error"')) {
-          return JSON.parse(text);
-        }
-      }
-    } catch(e) { lastErr = e; }
-  }
-  throw new Error(lastErr?.message || 'All proxies failed');
+  const workerUrl = 'https://misty-pond-8024.c46341ty-15.workers.dev/?url=' + encodeURIComponent(targetUrl);
+  const res = await fetch(workerUrl, { signal: AbortSignal.timeout(timeout) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  return JSON.parse(text);
 }
 
 // 単一シンボルを取得（最新価格 + 前日終値）
