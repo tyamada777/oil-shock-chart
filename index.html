@@ -100,6 +100,14 @@
   }
   #timelineChart { height: 520px !important; max-height: none !important; }
   #barChart { height: 420px !important; max-height: none !important; }
+  @media (max-width: 600px) {
+    #timelineChart { height: 280px !important; }
+    #barChart { height: 260px !important; }
+  }
+  @media (max-width: 600px) {
+    #timelineChart { height: 300px !important; }
+    #barChart { height: 280px !important; }
+  }
 
   /* CARDS */
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
@@ -251,6 +259,7 @@
   }
   .axis-label-x { position: absolute; bottom: -20px; right: 0; color: var(--muted); font-size: 10px; }
   .axis-label-y { position: absolute; top: 0; left: -22px; color: var(--muted); font-size: 10px; writing-mode: vertical-rl; }
+  @media (max-width: 600px) { .axis-label-y { display: none; } }
 
   /* SOURCES */
   .sources-wrap { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--border); }
@@ -284,6 +293,27 @@
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     background: rgba(255,45,85,0.06); border: 1px solid rgba(255,45,85,0.2);
     border-radius: 10px; padding: 12px 18px; margin-bottom: 24px;
+  }
+  @media (max-width: 600px) {
+    .live-update-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .live-prices { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .live-price-item { min-width: unset; }
+    .update-status { margin-left: 0; text-align: center; }
+    .update-btn, .update-btn-hist { justify-content: center; }
+  }
+  @media (max-width: 600px) {
+    .live-update-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .live-prices { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .live-price-item { min-width: unset; }
+    .update-status { margin-left: 0; text-align: center; }
+    .update-btn, .update-btn-hist { justify-content: center; }
+  }
+  @media (max-width: 600px) {
+    .live-update-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .live-prices { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .live-price-item { min-width: unset; }
+    .update-status { margin-left: 0; text-align: center; }
+    .update-btn, .update-btn-hist { justify-content: center; }
   }
   .update-btn {
     display: flex; align-items: center; gap: 7px;
@@ -434,6 +464,15 @@
     <div class="scatter-area" id="scatterArea">
       <span class="axis-label-x">原油上昇幅 →</span>
       <span class="axis-label-y">回復期間 ↑</span>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:#555;line-height:1.7">
+      <strong style="color:#4ECDC4">供給遮断規模の根拠：</strong><br>
+      1973年：OAPECの禁輸により世界供給の約<strong>7%</strong>（約430万bpd）が消失（Columbia CGEP）<br>
+      1979年：イラン革命・イイラク戦争により世界供給の約<strong>9%</strong>（約560万bpd）が消失（Montel Analytics）<br>
+      1990年：イラク・クウェート侵攻により世界供給の約<strong>6%</strong>（約430万bpd）が消失（Montel Analytics）<br>
+      2008年：需要急増・投機主因のため供給遮断なし（<strong>0%</strong>）<br>
+      2022年：ロシア制裁による欧州向け削減で世界供給の約<strong>4%</strong>（推計）<br>
+      2026年：ホルムズ海峡封鎖により世界石油需要の約<strong>20%</strong>（約2,000万bpd）が通過できず（Montel Analytics）
     </div>
   </div>
 </div>
@@ -1812,7 +1851,7 @@ const SHOCKS = [
       {d:972,sp:141.5888,nk:133.0143,oil:null,au:179.4765},
       {d:973,sp:140.8588,nk:133.2803,oil:null,au:178.0224}
     ],
-    drop: 0, nkDrop: 0, recovery: null, nkRecovery: null, oilRise: 204, disruption: 6, auRise: 201,
+    drop: 0, nkDrop: 0, recovery: null, nkRecovery: null, oilRise: 204, disruption: 9, auRise: 201,
   },
   {
     id: 'gulf', name: '湾岸戦争ショック', year: '1990–91', dateRange: '1990年7月〜1991年3月', baseDate: '1990-07-02',
@@ -2156,7 +2195,7 @@ const SHOCKS = [
       {d:360,sp:104.1331,nk:73.2058,oil:null,au:101.9678},
       {d:361,sp:103.2319,nk:72.4223,oil:null,au:102.5499}
     ],
-    drop: -19, nkDrop: -37, recovery: 7, nkRecovery: null, oilRise: 95, disruption: 9, auRise: 17,
+    drop: -19, nkDrop: -37, recovery: 7, nkRecovery: null, oilRise: 95, disruption: 6, auRise: 17,
   },
   {
     id: 'oil08', name: '原油高騰（リーマン複合）', year: '2008', dateRange: '2007年10月〜2009年6月', baseDate: '2008-01-02',
@@ -4240,6 +4279,7 @@ function buildTable() {
 // BAR CHART (disruption vs drop)
 // =====================
 function buildBarChart() {
+  if (barChart) { barChart.destroy(); barChart = null; }
   const labels = SHOCKS.map(s => s.year);
   const ctx = document.getElementById('barChart').getContext('2d');
   barChart = new Chart(ctx, {
@@ -4248,7 +4288,7 @@ function buildBarChart() {
       labels,
       datasets: [
         {
-          label: 'S&P500下落率(%)',
+          label: 'S&P500変動率(%)',
           data: SHOCKS.map(s => s.drop === 0 ? 0 : s.drop),
           backgroundColor: '#FF2D5599',
           borderColor: '#FF2D55',
@@ -4257,7 +4297,7 @@ function buildBarChart() {
           yAxisID: 'y1',
         },
         {
-          label: '日経225下落率(%)',
+          label: '日経225変動率(%)',
           data: SHOCKS.map(s => s.nkDrop === 0 ? 0 : s.nkDrop),
           backgroundColor: '#A78BFA99',
           borderColor: '#A78BFA',
@@ -4266,7 +4306,7 @@ function buildBarChart() {
           yAxisID: 'y1',
         },
         {
-          label: '金上昇率(%)',
+          label: '金変動率(%)',
           data: SHOCKS.map(s => s.auRise),
           backgroundColor: '#FFE56699',
           borderColor: '#FFE566',
@@ -4275,7 +4315,7 @@ function buildBarChart() {
           yAxisID: 'y1',
         },
         {
-          label: '原油上昇率(%)',
+          label: '原油変動率(%)',
           data: SHOCKS.map(s => s.oilRise),
           backgroundColor: '#F7C59F99',
           borderColor: '#F7C59F',
@@ -4309,8 +4349,8 @@ function buildBarChart() {
             label: ctx => {
               const v = ctx.parsed.y;
               if (ctx.dataset.yAxisID === 'y2') return ` 供給遮断: ${v}%`;
-              if (ctx.dataset.label === '金上昇率(%)') return ` 金上昇: +${v}%`;
-              if (ctx.dataset.label === '原油上昇率(%)') return ` 原油上昇: +${v}%`;
+              if (ctx.dataset.label === '金変動率(%)') return ` 金上昇: +${v}%`;
+              if (ctx.dataset.label === '原油変動率(%)') return ` 原油上昇: +${v}%`;
               if (v === 0) return ` ${ctx.dataset.label}: 上昇（下落なし）`;
               return ` ${ctx.dataset.label}: ${v}%`;
             }
@@ -4322,13 +4362,14 @@ function buildBarChart() {
         y1: {
           position: 'left', grid: { color: 'rgba(255,255,255,0.04)' },
           min: -60, max: 210,
-          ticks: { color: '#aaa', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' },
-          title: { display: true, text: '株価下落率(−) / 金上昇率(+)', color: '#aaa', font: { family: 'IBM Plex Mono', size: 10 } },
+          ticks: { color: '#aaa', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%', maxTicksLimit: 6 },
+          title: { display: false },
         },
         y2: {
           position: 'right', grid: { display: false },
-          ticks: { color: '#4ECDC4', font: { family: 'IBM Plex Mono', size: 10 } },
-          title: { display: true, text: '供給遮断規模(%)', color: '#4ECDC4', font: { family: 'IBM Plex Mono', size: 10 } },
+          min: -5.71, max: 20,
+          ticks: { color: '#4ECDC4', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v >= 0 ? v : '' },
+          title: { display: false },
         }
       }
     }
@@ -4340,20 +4381,24 @@ function buildBarChart() {
 // =====================
 function buildScatter() {
   const area = document.getElementById('scatterArea');
+  // 既存バブルをクリア
+  area.querySelectorAll('.bubble, .bubble-2026').forEach(el => el.remove());
   const maxOil = 400, maxRec = 40;
   SHOCKS.forEach(s => {
     const x = (s.oilRise / maxOil) * 82 + 6;
-    // ongoingの場合は回復期間を想定最大(40ヶ月)として上段に配置
     const recVal = s.ongoing ? 40 : s.recovery;
     const y = (1 - recVal / maxRec) * 80 + 8;
     const size = s.disruption * 3 + 14;
+    // バブルがはみ出さないようにクランプ
+    const clampedX = Math.min(Math.max(x, 5), 93);
+    const clampedY = Math.min(Math.max(y, 5), 93);
     const b = document.createElement('div');
     b.className = s.ongoing ? 'bubble-2026' : 'bubble';
     b.title = s.ongoing
       ? `${s.year}: 進行中（回復期間未定）, 原油+${s.oilRise}%, 供給遮断${s.disruption}%`
       : `${s.year}: 回復${s.recovery}ヶ月, 原油+${s.oilRise}%`;
-    b.style.left = x + '%';
-    b.style.top = y + '%';
+    b.style.left = clampedX + '%';
+    b.style.top = clampedY + '%';
     b.style.width = size + 'px';
     b.style.height = size + 'px';
     if (!s.ongoing) b.style.background = s.color;
@@ -4582,6 +4627,7 @@ async function fetchHistoryData() {
       buildCards();
       buildTable();
       updateTimelineChart();
+      buildScatter();
       const lastDay = Math.max(...newPoints.map(p => p.d));
       status.textContent = `✓ 過去データ更新完了 · Day${lastDay} · ${newPoints.length}日分取得`;
     } else {
@@ -4667,6 +4713,7 @@ async function fetchHistoryData() {
       buildCards();
       buildTable();
       updateTimelineChart();
+      buildScatter();
       const lastDay = Math.max(...newPoints.map(p => p.d));
       status.textContent = `✓ 過去データ更新完了 · Day${lastDay} · ${newPoints.length}日分`;
     } else {
