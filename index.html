@@ -511,11 +511,12 @@
   </div>
 </div>
 
-<!-- RAW DATA SECTION -->
-<div class="raw-data-wrap">
-  <div class="raw-data-title">RAW DATA</div>
-  <div class="raw-data-subtitle">各ショックの月次データ（正規化値・100=ショック発生時点）</div>
-  <div class="raw-grid" id="raw-data-section"></div>
+
+  <div style="display:none">
+    <div class="raw-data-title">RAW DATA</div>
+    <div class="raw-data-subtitle">各ショックの月次データ（正規化値・100=ショック発生時点）</div>
+    <div class="raw-grid" id="raw-data-section"></div>
+  </div>
 </div>
 
 <!-- SOURCES SECTION -->
@@ -4120,8 +4121,20 @@ function buildTimelineChart() {
         x: {
           type: 'linear',
           min: -180, max: 1000,
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#555', font: { family: 'IBM Plex Mono', size: window.innerWidth < 600 ? 8 : 10 }, stepSize: 50 },
+          grid: {
+            color: ctx => ctx.tick.value % 50 === 0
+              ? 'rgba(255,255,255,0.12)'
+              : ctx.tick.value % 5 === 0
+                ? 'rgba(255,255,255,0.04)'
+                : 'transparent',
+            lineWidth: ctx => ctx.tick.value % 50 === 0 ? 1.5 : 0.75,
+          },
+          ticks: {
+            color: '#555',
+            font: { family: 'IBM Plex Mono', size: window.innerWidth < 600 ? 8 : 10 },
+            stepSize: 5,
+            callback: (val) => val % 50 === 0 ? val : '',
+          },
           title: { display: true, text: '発生からの日数（営業日ベース）', color: '#444', font: { family: 'IBM Plex Mono', size: window.innerWidth < 600 ? 8 : 10 } },
         },
         y: {
